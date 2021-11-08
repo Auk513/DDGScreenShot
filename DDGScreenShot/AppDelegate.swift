@@ -8,6 +8,9 @@
 
 import UIKit
 
+let bottomMargint: CGFloat = 80
+let navHeight: CGFloat = 64
+
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
