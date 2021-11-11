@@ -9,8 +9,8 @@
 import UIKit
 import ObjectiveC
 
-class DDGManage: NSObject {
-    static var share = DDGManage()
+public class DDGManage: NSObject {
+    public static var share = DDGManage()
     public func composeImageWithLogo( bgImage: UIImage,
                                imageRect: [CGRect],
                                images:[UIImage]) -> UIImage {

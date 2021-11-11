@@ -130,15 +130,3 @@ public extension UIScrollView {
     }
 }
 
-public extension UIWebView {
-    
-    func DDGContentscreenShot (_ completionHandler: @escaping (_ screenShotImage: UIImage?) -> Void) {
-        self.scrollView.DDGContentScreenShot(completionHandler)
-    }
-    
-    func DDGContentScrollScreenShot (_ completionHandler: @escaping (_ screenShotImage: UIImage?) -> Void) {
-        self.scrollView.DDGContentScrollScreenShot(completionHandler)
-    }
-    
-}
-
