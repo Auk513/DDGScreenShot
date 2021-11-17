@@ -11,6 +11,8 @@ import WebKit
 
 private var DDGViewScreenShotKey_IsShoting: String = "DDGViewScreenShot_AssoKey_isShoting"
 
+private var DDGViewScreenShotKey_ProgressBlock: String = "DDGViewScreenShot_AssoKey_ProgressBlock"
+
 public extension UIView {
     
     func ddgSetFrame(_ frame: CGRect) {
@@ -33,6 +35,15 @@ public extension UIView {
         set(newValue) {
             let num = NSNumber(value: newValue as Bool)
             objc_setAssociatedObject(self, &DDGViewScreenShotKey_IsShoting, num, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        }
+    }
+    
+    var progressBlock: ((Int, Int) -> Void)? {
+        get {
+            return objc_getAssociatedObject(self, &DDGViewScreenShotKey_ProgressBlock) as? ((Int, Int) -> Void)
+        }
+        set(newValue) {
+            objc_setAssociatedObject(self, &DDGViewScreenShotKey_ProgressBlock, newValue, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN_NONATOMIC)
         }
     }
     

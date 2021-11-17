@@ -12,9 +12,10 @@ import WebKit
 
 public extension WKWebView {
     
-    func DDGContentScreenShot(_ completionHandler:@escaping (_ screenShotImage: UIImage?) -> Void) {
+    func DDGContentScreenShot(progress: @escaping ((Int, Int) -> Void), _ completionHandler:@escaping (_ screenShotImage: UIImage?) -> Void) {
         
         self.isShoting = true
+        self.progressBlock = progress
         
         let offset = self.scrollView.contentOffset
         
@@ -22,6 +23,10 @@ public extension WKWebView {
         let snapShotView = self.snapshotView(afterScreenUpdates: true)
         snapShotView?.frame = CGRect(x: self.frame.origin.x, y: self.frame.origin.y, width: (snapShotView?.frame.size.width)!, height: (snapShotView?.frame.size.height)!)
         self.superview?.addSubview(snapShotView!)
+        let shadowView = UIView()
+        shadowView.frame = snapShotView?.bounds ?? .zero
+        shadowView.backgroundColor = .init(white: 1, alpha: 0.3)
+        snapShotView?.addSubview(shadowView)
         
         if self.frame.size.height < self.scrollView.contentSize.height {
             self.scrollView.contentOffset = CGPoint(x: 0, y: self.scrollView.contentSize.height - self.frame.size.height)
@@ -35,6 +40,7 @@ public extension WKWebView {
                 
                 strongSelf.scrollView.contentOffset = offset
                 
+                shadowView.removeFromSuperview()
                 snapShotView?.removeFromSuperview()
                 
                 strongSelf.isShoting = false
@@ -95,6 +101,7 @@ public extension WKWebView {
             targetView.drawHierarchy(in: splitFrame, afterScreenUpdates: true)
             
             if index < maxIndex {
+                self.progressBlock?(index+1, maxIndex)
                 self.DDGContentPageDraw(targetView, index: index + 1, maxIndex: maxIndex, drawCallback: drawCallback)
             }else{
                 drawCallback()
@@ -105,14 +112,19 @@ public extension WKWebView {
     
     // Simulate People Action, all the `fixed` element will be repeate
     // shotScreenContentScrollCapture will capture all content without simulate people action, more perfect.
-    func shotScreenContentScrollCapture (_ completionHandler: @escaping (_ capturedImage: UIImage?) -> Void) {
+    func shotScreenContentScrollCapture (progress: @escaping ((Int, Int) -> Void), _ completionHandler: @escaping (_ capturedImage: UIImage?) -> Void) {
         
         self.isShoting = true
+        self.progressBlock = progress
         
         // Put a fake Cover of View
         let snapShotView = self.snapshotView(afterScreenUpdates: true)
         snapShotView?.frame = CGRect(x: self.frame.origin.x, y: self.frame.origin.y, width: (snapShotView?.frame.size.width)!, height: (snapShotView?.frame.size.height)!)
         self.superview?.addSubview(snapShotView!)
+        let shadowView = UIView()
+        shadowView.frame = snapShotView?.bounds ?? .zero
+        shadowView.backgroundColor = .init(white: 1, alpha: 0.3)
+        snapShotView?.addSubview(shadowView)
         
         // Backup
         let bakOffset    = self.scrollView.contentOffset
@@ -130,6 +142,7 @@ public extension WKWebView {
             
             // Recover
             strongSelf?.scrollView.setContentOffset(bakOffset, animated: false)
+            shadowView.removeFromSuperview()
             snapShotView?.removeFromSuperview()
             
             strongSelf?.isShoting = false
@@ -148,6 +161,7 @@ public extension WKWebView {
             self.drawHierarchy(in: splitFrame, afterScreenUpdates: true)
             
             if index < maxIndex {
+                self.progressBlock?(index+1, maxIndex)
                 self.shotScreenContentScrollPageDraw(index + 1, maxIndex: maxIndex, drawCallback: drawCallback)
             }else{
                 drawCallback()

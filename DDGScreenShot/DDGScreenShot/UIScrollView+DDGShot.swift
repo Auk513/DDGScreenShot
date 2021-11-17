@@ -79,14 +79,19 @@ public extension UIScrollView {
     
     // Simulate People Action, all the `fixed` element will be repeate
     // DDGContentScrollScreenShot will capture all content without simulate people action, more perfect.
-    func DDGContentScrollScreenShot (_ completionHandler: @escaping (_ screenShotImage: UIImage?) -> Void) {
+    func DDGContentScrollScreenShot (progress: @escaping ((Int, Int) -> Void), _ completionHandler: @escaping (_ screenShotImage: UIImage?) -> Void) {
         
         self.isShoting = true
+        self.progressBlock = progress
         
         // Put a fake Cover of View
         let snapShotView = self.snapshotView(afterScreenUpdates: true)
         snapShotView?.frame = CGRect(x: self.frame.origin.x, y: self.frame.origin.y, width: (snapShotView?.frame.size.width)!, height: (snapShotView?.frame.size.height)!)
         self.superview?.addSubview(snapShotView!)
+        let shadowView = UIView()
+        shadowView.frame = snapShotView?.bounds ?? .zero
+        shadowView.backgroundColor = .init(white: 1, alpha: 0.3)
+        snapShotView?.addSubview(shadowView)
         
         // Backup
         let bakOffset    = self.contentOffset
@@ -104,6 +109,7 @@ public extension UIScrollView {
             
             // Recover
             strongSelf?.setContentOffset(bakOffset, animated: false)
+            shadowView.removeFromSuperview()
             snapShotView?.removeFromSuperview()
             
             strongSelf?.isShoting = false
@@ -122,6 +128,7 @@ public extension UIScrollView {
             self.drawHierarchy(in: splitFrame, afterScreenUpdates: true)
             
             if index < maxIndex {
+                self.progressBlock?(index+1, maxIndex)
                 self.DDGContentScrollPageDraw(index + 1, maxIndex: maxIndex, drawCallback: drawCallback)
             }else{
                 drawCallback()
